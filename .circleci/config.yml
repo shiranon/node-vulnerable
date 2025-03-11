@@ -3,6 +3,7 @@ orbs:
   aws-cli: circleci/aws-cli@5.2.0
   aws-ecr: circleci/aws-ecr@9.4.0
 jobs:
+  # Build node and test
   build-and-test:
     docker:
       - image: cimg/node:14.20.0
@@ -17,6 +18,7 @@ jobs:
       - run:
           name: "Run tests"
           command: "npm test"
+  # Say git version
   say-git-version:
     docker:
       - image: cimg/base:current
@@ -25,9 +27,21 @@ jobs:
       - run:
           name: "Say git version"
           command: "echo << pipeline.git.revision >>"
+  # Build and push image to ECR
+  build-and-push-node-image:
+    executor:
+      name: aws-ecr/default
+      image: ubuntu-2204:2024.05.1
+    steps:
+      - checkout
+      - aws-cli/setup:
+          region: AWS_DEFAULT_REGION
+      - run:
+          aws sts get-caller-identity
 
 workflows:
   say-git-version-workflow:
     jobs:
       - say-git-version
       - build-and-test
+      - build-and-push-node-image
