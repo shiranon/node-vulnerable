@@ -57,7 +57,7 @@ jobs:
       - run:
           name: "Update AWS Inspector"
           command: |
-            inspector2 update-filter \
+            aws inspector2 update-filter \
               --filter-arn "arn:aws:inspector2:ap-northeast-1:$AWS_ACCOUNT_ID:owner/$AWS_ACCOUNT_ID/filter/filter_id" \
               --filter-criteria '{
                 "ecrImageTags": [
