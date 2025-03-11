@@ -58,13 +58,13 @@ jobs:
           name: "Update AWS Inspector"
           command: |
             aws inspector2 update-filter \
-              --filter-arn "arn:aws:inspector2:ap-northeast-1:$AWS_ACCOUNT_ID:owner/$AWS_ACCOUNT_ID/filter/filter_id" \
+              --filter-arn "arn:aws:inspector2:ap-northeast-1:$AWS_ACCOUNT_ID:owner/$AWS_ACCOUNT_ID/filter/050df31362af85d0" \
               --filter-criteria '{
                 "ecrImageTags": [
                   {"comparison": "EQUALS","value": "<< pipeline.git.revision >>"}
                 ],
                 "ecrImageRepositoryName": [
-                  {"comparison": "EQUALS","value": "test/express"}
+                  {"comparison": "EQUALS","value": "filter-node"}
                 ]
               }'
 workflows:
