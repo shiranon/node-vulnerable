@@ -38,6 +38,13 @@ jobs:
           region: AWS_DEFAULT_REGION
       - run:
           aws sts get-caller-identity
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup
+          repo: test/express
+          extra_build_args: --provenance=false
+          tag: << pipeline.git.revision >>
+          skip_when_tags_exist: true
 
 workflows:
   say-git-version-workflow:
