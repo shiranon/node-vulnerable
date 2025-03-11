@@ -1,9 +1,22 @@
 version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@5.2.0
+  aws-ecr: circleci/aws-ecr@9.4.0
 jobs:
+  build-and-test:
+    docker:
+      - image: cimg/node:14-alpine
+    steps:
+      - checkout
+      - run:
+          name: "Install dependencies"
+          command: "npm install"
+      - run:
+          name: "Run tests"
+          command: "npm test"
   say-git-version:
     docker:
       - image: cimg/base:current
-
     steps:
       - checkout
       - run:
