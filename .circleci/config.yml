@@ -64,7 +64,7 @@ jobs:
                   {"comparison": "EQUALS","value": "<< pipeline.git.revision >>"}
                 ],
                 "ecrImageRepositoryName": [
-                  {"comparison": "EQUALS","value": "filter-node"}
+                  {"comparison": "EQUALS","value": "test/express"}
                 ]
               }'
 workflows:
