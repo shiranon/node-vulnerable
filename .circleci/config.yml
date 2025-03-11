@@ -5,7 +5,7 @@ orbs:
 jobs:
   build-and-test:
     docker:
-      - image: cimg/node:14-alpine
+      - image: cimg/node:14.20.0
     steps:
       - checkout
       - run:
