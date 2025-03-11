@@ -47,8 +47,9 @@ jobs:
           skip_when_tags_exist: true
   # use aws-cli to update AWS Inspector
   update-aws-inspector:
-    docker:
-      - image: cimg/aws:2023.11
+    executor:
+      name: aws-cli/default
+      tag: '2024.10'
     steps:
       - checkout
       - aws-cli/setup:
