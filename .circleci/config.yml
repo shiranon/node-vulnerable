@@ -18,15 +18,15 @@ jobs:
       - run:
           name: "Run tests"
           command: "npm test"
-  # Say git version
-  say-git-version:
+  # Say git version and aws account
+  say-git-version-and-aws-account:
     docker:
       - image: cimg/base:current
     steps:
       - checkout
       - run:
           name: "Say git version"
-          command: "echo << pipeline.git.revision >>"
+          command: "echo  << pipeline.git.revision >> REGION is << AWS_DEFAULT_REGION >>"
   # Build and push image to ECR
   build-and-push-node-image:
     executor:
@@ -49,6 +49,6 @@ jobs:
 workflows:
   say-git-version-workflow:
     jobs:
-      - say-git-version
+      - say-git-version-and-aws-account
       - build-and-test
       - build-and-push-node-image
