@@ -12,6 +12,9 @@ jobs:
           name: "Install dependencies"
           command: "npm install"
       - run:
+          name: "Check Jest version"
+          command: "npx jest --version"
+      - run:
           name: "Run tests"
           command: "npm test"
   say-git-version:
@@ -27,3 +30,4 @@ workflows:
   say-git-version-workflow:
     jobs:
       - say-git-version
+      - build-and-test
