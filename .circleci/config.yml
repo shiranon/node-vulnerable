@@ -1,0 +1,76 @@
+version: 2.1
+orbs:
+  aws-cli: circleci/aws-cli@5.2.0
+  aws-ecr: circleci/aws-ecr@9.4.0
+jobs:
+  # Build node and test
+  build-and-test:
+    docker:
+      - image: cimg/node:14.20.0
+    steps:
+      - checkout
+      - run:
+          name: "Install dependencies"
+          command: "npm install"
+      - run:
+          name: "Check Jest version"
+          command: "npx jest --version"
+      - run:
+          name: "Run tests"
+          command: "npm test"
+  # Say git version and aws account
+  say-git-version-and-aws-account:
+    docker:
+      - image: cimg/base:current
+    steps:
+      - checkout
+      - run:
+          name: "Say git version and AWS account"
+          command: "echo << pipeline.git.revision >> && echo $AWS_DEFAULT_REGION"
+  # Build and push image to ECR
+  build-and-push-node-image:
+    executor:
+      name: aws-ecr/default
+      image: ubuntu-2204:2024.05.1
+    steps:
+      - checkout
+      - aws-cli/setup:
+          region: AWS_DEFAULT_REGION
+      - run:
+          aws sts get-caller-identity
+      - aws-ecr/build_and_push_image:
+          auth:
+            - aws-cli/setup
+          repo: test/express
+          extra_build_args: --provenance=false
+          tag: << pipeline.git.revision >>
+          skip_when_tags_exist: true
+  # use aws-cli to update AWS Inspector
+  update-aws-inspector:
+    executor:
+      name: aws-cli/default
+      tag: '2024.10'
+    steps:
+      - checkout
+      - aws-cli/setup:
+          region: ${AWS_DEFAULT_REGION}
+      - run:
+          name: "Update AWS Inspector"
+          command: |
+            aws inspector2 update-filter \
+              --filter-arn "arn:aws:inspector2:ap-northeast-1:$AWS_ACCOUNT_ID:owner/$AWS_ACCOUNT_ID/filter/050df31362af85d0" \
+              --filter-criteria '{
+                "ecrImageTags": [
+                  {"comparison": "EQUALS","value": "<< pipeline.git.revision >>"}
+                ],
+                "ecrImageRepositoryName": [
+                  {"comparison": "EQUALS","value": "test/express"}
+                ]
+              }'
+workflows:
+  say-git-version-workflow:
+    jobs:
+      - say-git-version-and-aws-account
+      - build-and-test
+      - build-and-push-node-image
+      - update-aws-inspector
